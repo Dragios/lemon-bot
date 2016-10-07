@@ -111,7 +111,7 @@ class TagMergeBot:
                 retval, _ = _git("merge", pr["ref"], cwd=self.tracking_path)
                 if retval != 0:
                     _git("merge", "--abort", cwd=self.tracking_path)
-                    logger.warn("Branch ({0}, {1}) failed to merge.".format(pr["ref"], pr["id"]))
+                    logger.warn("Branch ({0}, {1}) failed to merge.".format(pr["ref"], pr["number"]))
                     total_failed += 1
         return total_failed
 
