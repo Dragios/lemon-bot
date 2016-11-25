@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import subprocess
-import yaml
 import os, sys, stat, errno, shutil
 import logging
 import requests
@@ -23,7 +22,6 @@ logger.addHandler(fh)
 logger.addHandler(eh)
 logger.addHandler(ch)
 
-# TODO: Change this to use a yaml config file instead
 # TODO: add multiple label support. Joining on a comma does an AND not an OR in github api, so we need to make multiple requests
 LABEL_TO_FETCH = 'pr:bleeding-edge-merge'
 
