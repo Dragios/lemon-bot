@@ -12,7 +12,8 @@ Pull requests to fix issues with the bot are more than welcome.
 
 ## What does it do?
 
-After doing the self-update, the bot will visit each of the listed `PULL_REPOS`.
+After doing the self-update, the bot will clone the latest `MAIN_REPO` and resync `PUSH_REPO`/master.
+After that, each of the `PULL_REPOS` is visited.
 It will look for PRs on GitHub labelled with `LABEL_TO_FETCH` and merge those onto the `MAIN_REPO`/master branch.
 If a PR fails to merge it will be ignored.
 Once everything has been merged the bot will push the resulting files to the `PUSH_REPO`/`self.branch_name` branch.
