@@ -71,13 +71,13 @@ class TagMergeBot:
             self.current_prs[repo['remote_name']] = []
             res = requests.get(GITHUB_API+'/{owner}/{repo}/issues?labels={labels}&per_page=100'.format(labels=LABEL_TO_FETCH, owner=repo['owner'], repo=repo['name']))
             if res.status_code != 200:
-                logger.error("Could not retrive pull requests from github")
+                logger.error("Could not retrive pull requests from github. Status: {status}".format(status=res.status_code))
                 return False
             issues = res.json()
             for issue in issues:
                 pr_response = requests.get(issue['pull_request']['url'])
                 if res.status_code != 200:
-                    logger.warn("Couldn't fetch the PRs details for PR {pr}".format(pr=issue['']))
+                    logger.warn("Couldn't fetch the PRs details for PR {pr}. Status: {status}".format(pr=issue[''], status=res.status_code))
                     continue
                 pr = pr_response.json()
                 self.current_prs[repo['remote_name']].append({"number": pr['number'], "commit": pr['head']['sha'], "ref": pr['head']['ref']})
