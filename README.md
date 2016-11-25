@@ -12,7 +12,7 @@ Pull requests to fix issues with the bot are more than welcome.
 
 ## What does it do?
 
-After doing the self-update, the bot will clone the latest `MAIN_REPO` and resync `PUSH_REPO`/master.
+The bot will clone the latest `MAIN_REPO` and resync `PUSH_REPO`/master.
 After that, each of the `PULL_REPOS` is visited.
 It will look for PRs on GitHub labelled with `LABEL_TO_FETCH` and merge those onto the `MAIN_REPO`/master branch.
 If a PR fails to merge it will be ignored.
@@ -25,10 +25,8 @@ The default configuration is to log to *debug.log*, *error.log* and stdout.
 
 ## Installation
 
-Clone this repo and configure lemonbot by modifying the configuration in *tag_build.py*.
+Download *tag_build.py* and configure lemonbot by modifying the configuration at the top of the file.
 You can then run the script.
-Note that the script depends on being part of a git repo.
-The script uses `git pull origin master` to update itself.
 
 ## License
 
