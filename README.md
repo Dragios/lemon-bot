@@ -3,12 +3,12 @@
 Bot used for merging Citra bleeding-edge builds.
 At the moment, it uses the GitHub API to find builds to merge.
 
+Pull requests to fix issues with the bot are more than welcome.
+
 ## Use in Citra bleeding-edge build process
 
 The actual bot is ran on a server administrated by Flame Sage.
 It is ran on a daily cron-job and updates from this repo before trying to merge builds.
-
-Pull requests to fix issues with the bot are more than welcome.
 
 ## What does it do?
 
