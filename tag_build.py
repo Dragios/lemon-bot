@@ -7,6 +7,7 @@ import logging
 import requests
 import simplejson as json
 import datetime
+from tabulate import tabulate
 
 from urllib.parse import urlparse
 
@@ -80,7 +81,7 @@ class TagMergeBot:
                     logger.warn("Couldn't fetch the PRs details for PR {pr}".format(pr=issue['']))
                     continue
                 pr = pr_response.json()
-                self.current_prs[repo['remote_name']].append({"number": pr['number'], "commit": pr['head']['sha'], "ref": pr['head']['ref']})
+                self.current_prs[repo['remote_name']].append({"number": pr['number'], "commit": pr['head']['sha'], "ref": pr['head']['ref'], "author": pr['user']['login']})
         return True
 
     def reclone(self):
@@ -101,18 +102,50 @@ class TagMergeBot:
                 _git("fetch", repo['remote_name'], "pull/{0}/head:{1}".format(pr['number'], pr['ref']), cwd=self.tracking_path)
 
     def merge(self):
+        
+        readme_content = ""
+
         # _git("branch", "-D", branch_name, cwd=self.repo_path)
         # _git("checkout", "master", cwd=self.repo_path)
         # checkout a new branch based off master
         _git("checkout", "-b", self.branch_name, cwd=self.tracking_path)
         total_failed = 0
+        merges = []
         for repo in self.repos:
             for pr in self.current_prs[repo['remote_name']]:
+                merge = [pr['number'], pr['ref'], "`" + pr['commit'] + "`", pr['author']]
                 retval, _ = _git("merge", pr["ref"], cwd=self.tracking_path)
                 if retval != 0:
+                    merge.append("Failed") # TODO: Link to a log to show why this happened
                     _git("merge", "--abort", cwd=self.tracking_path)
                     logger.warn("Branch ({0}, {1}) failed to merge.".format(pr["ref"], pr["number"]))
                     total_failed += 1
+                else:
+                    merge.append("Merged")
+                merges.append(merge)
+
+        readme_content += "# lemonbot merge log\n\nScroll down for the original README.md!\n"
+        readme_content += "\n======\n\n"
+        readme_content += tabulate(merges, ["PR", "Ref", "Commit", "Author", "Status"], tablefmt="pipe") + "\n"
+
+        readme_path = os.path.join(self.tracking_path, 'README.md')
+        try:
+            with open(readme_path, 'r') as original_readme:
+                readme_content += "\nEnd of merge log. You can find the original README.md below the break.\n"
+                readme_content += "\n======\n\n"
+                readme_content += original_readme.read()
+        except IOError:
+            readme_content += "\nEnd of merge log. No original README.md existed.\n"
+
+        try:
+            with open(readme_path, 'w') as readme:
+                readme.write(readme_content)
+                readme.close()
+                _git("add", "README.md", cwd=self.tracking_path)
+                _git("commit", "-m", "lemonbot merge log", cwd=self.tracking_path)
+        except IOError:
+            logger.warn("Could not write README.md")
+
         return total_failed
 
     def push(self):
