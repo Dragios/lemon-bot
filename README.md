@@ -1,67 +1,34 @@
 # lemonbot
-Citra bot used for bleeding edge builds
 
-People with admin access can just edit the merge_list.yml to update
-what branches are going to be built on the next run. Currently without webhooks
-this bot just checks every 5 minutes for updates.
+Bot used for merging Citra bleeding-edge builds.
+At the moment, it uses the GitHub API to find builds to merge.
+
+## Use in Citra bleeding-edge build process
+
+The actual bot is ran on a server administrated by Flame Sage.
+It is ran on a daily cron-job and updates from this repo before trying to merge builds.
 
 Pull requests to fix issues with the bot are more than welcome.
 
 ## What does it do?
 
-The bot essentially runs the following git commands to build a merge of the branches
+After doing the self-update, the bot will visit each of the listed `PULL_REPOS`.
+It will look for PRs on GitHub labelled with `LABEL_TO_FETCH` and merge those onto the `MAIN_REPO`/master branch.
+If a PR fails to merge it will be ignored.
+Once everything has been merged the bot will push the resulting files to the `PUSH_REPO`/`self.branch_name` branch.
 
-```
-TODO: Fill this out. Theres a list of commands that runs at the end of build py but its a little old
-```
-In the event of a failed merge, that branch is marked as failed merge and left out of the final build.
+The path `self.tracking_path` is used as a working directory for the git merge operations.
 
-Branches can be marked as required to signify that if this branch fails to merge than the build should fail/
+The status will be logged via the `logger` object.
+The default configuration is to log to *debug.log*, *error.log* and stdout.
 
-Branches are merged in order from top to bottom. Because of this, you should put the most important branches first
-in order to increase their priority.
+## Installation
 
-## Example merge_list.yml
+Clone this repo and configure lemonbot by modifying the configuration in *tag_build.py*.
+You can then run the script.
+Note that the script depends on being part of a git repo.
+The script uses `git pull origin master` to update itself.
 
-``` yaml
-# changes to these require a restart to take effect.
-tracking_repository: "https://github.com/foo/bar"
-push_repository: "https://github.com/whoknows/beta"
+## License
 
-tracking_remotes:
-    - name: baz
-      url: "https://github.com/baz/bar"
-      # use the scheduled checkup instead of webhook
-      web_hook: false
-    - name: contributor
-      url: "https://github.com/contributor/bar"
-
-merge_list:
-    - pr_id: 1234
-      branch: prerequiste-changes
-      required: true
-    - pr_id: 2468
-      branch: cool-feature-but-not-necessary
-    - pr_id: 1567
-      branch: fails-to-merge-build-will-continue
-    - pr_id: 1492
-      branch: fails-to-merge-build-fails-too
-      required: true
-    - pr_id: 2001
-      branch: a-space-odyssey
-    - remote: baz
-      branch: too-cool-to-pr-this
-
-# Someday I would like to have these option as well
-enable_trusted_prs: true
-auto_remove_merged: true
-
-```
-
-## Future goals
-
-* Webhook support. Need to get a webhook setup first though.
-* Trusted PRs. Auto add prs submitted by members of the repositories organization
-* Auto remove PRs that were merged into master since the last build
-* Remove the need for branch names in the yaml. They can be swapped out for the commit hash I bet if they are left blank.
-* Add different tracking remotes that can be pulled from
+lemonbot is licensed under the GPLv3 (or any later version). Refer to the license.txt file included.
