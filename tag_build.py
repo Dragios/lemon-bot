@@ -185,18 +185,7 @@ def handleRemoveReadonly(func, path, exc):
 
 if __name__ == "__main__":
     logger.info("=== Starting build at {date} ===".format(date=datetime.datetime.now()))
-    logger.debug("Pulling the latest from master")
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    logger.debug("Checking for merge bot updates")
-    _git("fetch", "origin", cwd=base_dir)
-    _, stdout = _git("rev-list", "HEAD...origin/master", "--count", cwd=base_dir)
-    if stdout and int(stdout) > 0:
-        logger.info("=> Changes detected. Pulling latest version and restarting the application")
-        _git("pull", "origin", "master", cwd=base_dir)
-        os.execv(sys.executable, [sys.executable] + sys.argv)
-        sys.exit(0)
-    else:
-        logger.debug("=> No changes to the script repo were detected. Continuing.")
 
     t = TagMergeBot(MAIN_REPO, PULL_REPOS, PUSH_REPO)
     ret = t.fetch_latest_prs()
