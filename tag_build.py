@@ -157,6 +157,9 @@ class TagMergeBot:
     def sync(self):
         _git("push", "-f", self.push_repo["name"], "master", cwd=self.tracking_path)
 
+    def remove_remote_branch(self):
+        _git("push", self.push_repo["name"], "--delete", self.branch_name, cwd=self.tracking_path)
+
     def push(self):
         _git("push", "-f", self.push_repo["name"], self.branch_name, cwd=self.tracking_path)
 
@@ -208,6 +211,7 @@ if __name__ == "__main__":
     t.pull_branches()
     failed = t.merge()
     logger.info("Number of failed merges: {failed}".format(failed=failed))
+    t.remove_remote_branch()
     t.push()
 
     # save this runs information
